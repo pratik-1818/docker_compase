@@ -23,12 +23,25 @@ jobs:
     - name: 🔨 Build and Start all containers
       run: docker-compose up --build -d
 
-    - name: ✅ Test FastAPI
+    - name: ⏳ Wait for containers to be ready
       run: |
-        sleep 10
-        curl http://localhost:8000
-        curl http://localhost:8000/docs
+        echo "Waiting for FastAPI to start..."
+        for i in {1..10}; do
+          if curl -s http://localhost:8000/docs > /dev/null; then
+            echo "FastAPI is up!"
+            break
+          else
+            echo "FastAPI not ready yet... retrying ($i/10)"
+            sleep 5
+          fi
+        done
+
+    - name: ✅ Test FastAPI endpoints
+      run: |
+        curl -i http://localhost:8000
+        curl -i http://localhost:8000/docs
 
     - name: ✅ Test Streamlit
       run: |
-        curl http://localhost:8501 || echo "Streamlit might not return plain HTML"
+        echo "Checking Streamlit status..."
+        curl -I http://localhost:8501 || echo "Streamlit might not return full HTML on root"
