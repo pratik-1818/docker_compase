@@ -1,18 +1,26 @@
-version: '3.9'
+version: "3.9"
 
 services:
-  fastapi:
-    build:
-      context: ./app
-    container_name: fastapi_app
+  fastapi_app:
+    build: ./app
     ports:
       - "8000:8000"
 
-  streamlit:
-    build:
-      context: ./streamlit_app
-    container_name: streamlit_app
+  streamlit_app:
+    build: ./streamlit_app
     ports:
       - "8501:8501"
+
+  tester:
+    image: curlimages/curl:latest
     depends_on:
-      - fastapi
+      - fastapi_app
+      - streamlit_app
+    command: >
+      sh -c "
+        echo '✅ Testing FastAPI...';
+        curl -sSf http://fastapi_app:8000 || echo '❌ FastAPI root failed';
+        curl -sSf http://fastapi_app:8000/docs || echo '❌ FastAPI docs failed';
+        echo '✅ Testing Streamlit...';
+        curl -sSf http://streamlit_app:8501 || echo '❌ Streamlit failed';
+      "
