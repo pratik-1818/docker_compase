@@ -34,7 +34,7 @@ services:
       streamlit_app:
         condition: service_healthy
     entrypoint: ["/bin/sh", "-c"]
-    command: >
+    command: |
       echo "Waiting for FastAPI...";
       for i in $(seq 1 10); do
         if curl -s http://fastapi_app:8000/ > /dev/null; then
@@ -56,3 +56,4 @@ services:
       done;
 
       echo "✅ Tester Done Successfully!";
+
