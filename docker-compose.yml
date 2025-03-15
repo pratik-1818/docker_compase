@@ -2,24 +2,24 @@ version: "3.9"
 
 services:
   fastapi_app:
-    build: ./app
+    build: ./fastapi
     container_name: fastapi_app
     ports:
       - "8000:8000"
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000"]
+      test: ["CMD", "curl", "-f", "http://127.0.0.1:8000"]
       interval: 10s
       timeout: 5s
       retries: 5
     restart: always
 
   streamlit_app:
-    build: ./streamlit_app
+    build: ./streamlit
     container_name: streamlit_app
     ports:
       - "8501:8501"
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8501"]
+      test: ["CMD", "curl", "-f", "http://127.0.0.1:8501"]
       interval: 10s
       timeout: 5s
       retries: 5
