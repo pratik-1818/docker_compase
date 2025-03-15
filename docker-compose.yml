@@ -2,25 +2,41 @@ version: "3.9"
 
 services:
   fastapi_app:
-    build: ./app
+    build: ./fastapi
+    container_name: fastapi_app
     ports:
       - "8000:8000"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: always
 
   streamlit_app:
-    build: ./streamlit_app
+    build: ./streamlit
+    container_name: streamlit_app
     ports:
       - "8501:8501"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8501"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: always
 
   tester:
     image: curlimages/curl:latest
+    container_name: tester
     depends_on:
-      - fastapi_app
-      - streamlit_app
+      fastapi_app:
+        condition: service_healthy
+      streamlit_app:
+        condition: service_healthy
+    entrypoint: ["/bin/sh", "-c"]
     command: >
-      sh -c "
-        echo '✅ Testing FastAPI...';
-        curl -sSf http://fastapi_app:8000 || echo '❌ FastAPI root failed';
-        curl -sSf http://fastapi_app:8000/docs || echo '❌ FastAPI docs failed';
-        echo '✅ Testing Streamlit...';
-        curl -sSf http://streamlit_app:8501 || echo '❌ Streamlit failed';
-      "
+      echo '✅ Testing FastAPI...' &&
+      curl -s http://fastapi_app:8000/ && echo '✅ FastAPI root passed' || echo '❌ FastAPI root failed' &&
+      curl -s http://fastapi_app:8000/docs && echo '✅ FastAPI docs passed' || echo '❌ FastAPI docs failed' &&
+      echo '✅ Testing Streamlit...' &&
+      curl -s http://streamlit_app:8501/ && echo '✅ Streamlit passed' || echo '❌ Streamlit failed'
