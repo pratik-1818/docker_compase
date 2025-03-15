@@ -15,7 +15,7 @@ services:
 
   streamlit_app:
     build:
-      context: ./streamlit
+      context: ./streamlit_app
     container_name: streamlit_app
     ports:
       - "8501:8501"
@@ -36,22 +36,22 @@ services:
     entrypoint: ["/bin/sh", "-c"]
     command: >
       echo "Waiting for FastAPI...";
-      for i in $$(seq 1 10); do
+      for i in $(seq 1 10); do
         if curl -s http://fastapi_app:8000/ > /dev/null; then
           echo "✅ FastAPI is up!";
           break;
         fi;
-        echo "⏳ Retrying FastAPI in 5s... ($$i)";
+        echo "⏳ Retrying FastAPI in 5s... ($i)";
         sleep 5;
       done;
 
       echo "Waiting for Streamlit...";
-      for i in $$(seq 1 10); do
+      for i in $(seq 1 10); do
         if curl -s http://streamlit_app:8501/ > /dev/null; then
           echo "✅ Streamlit is up!";
           break;
         fi;
-        echo "⏳ Retrying Streamlit in 5s... ($$i)";
+        echo "⏳ Retrying Streamlit in 5s... ($i)";
         sleep 5;
       done;
 
