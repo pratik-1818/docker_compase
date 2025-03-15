@@ -2,7 +2,7 @@ version: "3.9"
 
 services:
   fastapi_app:
-    build: ./fastapi
+    build: ./app
     container_name: fastapi_app
     ports:
       - "8000:8000"
@@ -14,7 +14,7 @@ services:
     restart: always
 
   streamlit_app:
-    build: ./streamlit
+    build: ./streamlit_app
     container_name: streamlit_app
     ports:
       - "8501:8501"
